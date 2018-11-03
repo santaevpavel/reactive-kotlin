@@ -1,0 +1,18 @@
+group 'ru.santaev'
+version '1.0'
+
+apply plugin: 'kotlin'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':library')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'io.kotlintest:kotlintest:2.0.7'
+    testImplementation "io.mockk:mockk:1.8.5"
+}
