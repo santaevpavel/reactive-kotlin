@@ -33,5 +33,30 @@ class ObservableTests {
             observer.onSuccess()
         }
     }
+
+    @Test
+    fun testEmpty() {
+        val observable = Observable.empty<Int>()
+        val observer: Observer<Int> = mockk(relaxUnitFun = true)
+
+        observable.subscribe(observer)
+
+        verifySequence {
+            observer.onSuccess()
+        }
+    }
+
+    @Test
+    fun testError() {
+        val error = RuntimeException("RuntimeException")
+        val observable = Observable.error<Int>(error)
+        val observer: Observer<Int> = mockk(relaxUnitFun = true)
+
+        observable.subscribe(observer)
+
+        verifySequence {
+            observer.onError(error)
+        }
+    }
 }
 

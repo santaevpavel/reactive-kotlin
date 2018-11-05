@@ -74,6 +74,18 @@ fun <T> Observable.Companion.just(vararg items: T): Observable<T> {
     })
 }
 
+fun <T> Observable.Companion.empty(): Observable<T> {
+    return create(onSubscribe = OnSubscribe { subscriber ->
+        subscriber.onSuccess()
+    })
+}
+
+fun <T> Observable.Companion.error(throwable: Throwable): Observable<T> {
+    return create(onSubscribe = OnSubscribe { subscriber ->
+        subscriber.onError(throwable)
+    })
+}
+
 fun <T> Observable.Companion.create(onSubscribe: OnSubscribe<T>): Observable<T> {
     return object : Observable<T> {
 
