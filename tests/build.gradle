@@ -9,8 +9,11 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    main.kotlin.srcDirs += '../library/src/main/kotlin'
+}
+
 dependencies {
-    implementation project(':library')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     testImplementation 'junit:junit:4.12'
     testImplementation 'io.kotlintest:kotlintest:2.0.7'

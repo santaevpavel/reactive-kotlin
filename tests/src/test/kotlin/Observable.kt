@@ -1,16 +1,29 @@
+package ru.santaev.reactivekotlin
+
 import io.mockk.mockk
 import io.mockk.verifySequence
 import org.junit.Test
-import ru.santaev.reactivekotlin.Observable
-import ru.santaev.reactivekotlin.Observer
-import ru.santaev.reactivekotlin.just
 
 class ObservableTests {
 
     @Test
-    fun testJust() {
+    fun testJustOneItem() {
+        val observable = Observable.just(1)
+        val observer: Observer<Int> = mockk(relaxUnitFun = true)
+
+        observable.subscribe(observer)
+
+        verifySequence {
+            observer.onNext(1)
+            observer.onSuccess()
+        }
+    }
+
+    @Test
+    fun testJustFew() {
         val observable = Observable.just(1, 2, 3)
-        val observer: Observer<Int> = mockk()
+        val observer: Observer<Int> = mockk(relaxUnitFun = true)
+
         observable.subscribe(observer)
 
         verifySequence {
@@ -20,5 +33,5 @@ class ObservableTests {
             observer.onSuccess()
         }
     }
-
 }
+
