@@ -1,9 +1,8 @@
 package ru.santaev.reactivekotlin
 
 
-import ru.santaev.reactivekotlin.*
-
 fun <T, R> Observable<T>.map(transformFunction: (T) -> R): Observable<R> = map(ItemTransformer(transformFunction))
+
 fun <T, R> Observable<T>.map(transformer: ItemTransformer<T, R>): Observable<R> {
     return Observable.create(
         OnSubscribe { subscriber ->
