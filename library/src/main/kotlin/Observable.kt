@@ -19,7 +19,6 @@ interface Observable<T> {
         })
     }
 
-
     companion object
 }
 
@@ -86,31 +85,6 @@ fun <T> Observable.Companion.error(throwable: Throwable): Observable<T> {
     })
 }
 
-fun <T, R> Observable<T>.map(transformFunction: (T) -> R): Observable<R> = map(ItemTransformer(transformFunction))
-
-fun <T, R> Observable<T>.map(transformer: ItemTransformer<T, R>): Observable<R> {
-    return Observable.create(
-        OnSubscribe { subscriber ->
-            val outputSubscriber = Subscriber(object : Observer<T> {
-
-                override fun onNext(item: T) {
-                    subscriber.onNext(transformer.transform(item))
-                }
-
-                override fun onSuccess() {
-                    subscriber.onSuccess()
-                }
-
-                override fun onError(error: Throwable) {
-                    subscriber.onError(error)
-                }
-
-            })
-            this.subscribe(outputSubscriber)
-        }
-    )
-}
-
 fun <T> Observable.Companion.create(onSubscribe: OnSubscribe<T>): Observable<T> {
     return object : Observable<T> {
 
@@ -125,21 +99,8 @@ fun <T> Observable.Companion.create(onSubscribe: OnSubscribe<T>): Observable<T> 
     }
 }
 
-interface ItemTransformer<I, O> {
-
-    fun transform(input: I): O
-}
-
 @Suppress("FunctionName")
-fun <I, O> ItemTransformer(transformFunction: (I) -> O): ItemTransformer<I, O> {
-    return object : ItemTransformer<I, O> {
-
-        override fun transform(input: I): O = transformFunction.invoke(input)
-    }
-}
-
-@Suppress("FunctionName")
-private fun <T> OnSubscribe(onSubscribe: (Subscriber<T>) -> Unit): OnSubscribe<T> {
+internal fun <T> OnSubscribe(onSubscribe: (Subscriber<T>) -> Unit): OnSubscribe<T> {
     return object : OnSubscribe<T> {
 
         override fun onSubscribe(subscriber: Subscriber<T>) {
@@ -148,7 +109,7 @@ private fun <T> OnSubscribe(onSubscribe: (Subscriber<T>) -> Unit): OnSubscribe<T
     }
 }
 
-private object EmptyOnDispose: OnDispose {
+internal object EmptyOnDispose: OnDispose {
 
     override fun onDispose() {
     }
