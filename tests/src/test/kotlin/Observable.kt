@@ -4,7 +4,7 @@ import io.mockk.mockk
 import io.mockk.verifySequence
 import org.junit.Test
 
-class ObservableTests {
+class MapTests {
 
     @Test
     fun testJustOneItem() {
@@ -56,40 +56,6 @@ class ObservableTests {
 
         verifySequence {
             observer.onError(error)
-        }
-    }
-
-    @Test
-    fun testMapIntToInt() {
-        val observable = Observable
-            .just(1, 2, 3)
-            .map { it * it }
-        val observer: Observer<Int> = mockk(relaxUnitFun = true)
-
-        observable.subscribe(observer)
-
-        verifySequence {
-            observer.onNext(1)
-            observer.onNext(4)
-            observer.onNext(9)
-            observer.onSuccess()
-        }
-    }
-
-    @Test
-    fun testMapIntToString() {
-        val observable = Observable
-            .just(1, 2, 3)
-            .map { "a".repeat(it) }
-        val observer: Observer<String> = mockk(relaxUnitFun = true)
-
-        observable.subscribe(observer)
-
-        verifySequence {
-            observer.onNext("a")
-            observer.onNext("aa")
-            observer.onNext("aaa")
-            observer.onSuccess()
         }
     }
 }
