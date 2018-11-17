@@ -68,7 +68,10 @@ class DisposableImpl(private val onDispose: OnDispose): Disposable {
 
 fun <T> Observable.Companion.just(vararg items: T): Observable<T> {
     return create(onSubscribe = OnSubscribe { subscriber ->
-        items.forEach { subscriber.onNext(it) }
+        items.forEach { item ->
+            if (subscriber.isDisposed) { return@OnSubscribe }
+            subscriber.onNext(item)
+        }
         subscriber.onSuccess()
     })
 }
@@ -106,6 +109,17 @@ internal fun <T> OnSubscribe(onSubscribe: (Subscriber<T>) -> Unit): OnSubscribe<
         override fun onSubscribe(subscriber: Subscriber<T>) {
             onSubscribe.invoke(subscriber)
         }
+    }
+}
+
+@Suppress("FunctionName")
+internal fun OnDispose(onDispose: () -> Unit): OnDispose {
+    return object : OnDispose {
+
+        override fun onDispose() {
+            onDispose.invoke()
+        }
+
     }
 }
 
