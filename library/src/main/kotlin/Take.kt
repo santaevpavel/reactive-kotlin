@@ -20,39 +20,52 @@ fun <T> Observable<T>.takeWhile(predicate: (T) -> Boolean): Observable<T> {
 fun <T> Observable<T>.takeWhile(predicate: Predicate<T>): Observable<T> {
     return Observable.create(
         OnSubscribe { subscriber ->
+            val observer = object : DisposableObserver<T>() {
+
+                override fun onNext(item: T) {
+                    if (!predicate.apply(item)) {
+                        onSuccess()
+                        dispose()
+                    } else {
+                        subscriber.onNext(item)
+                    }
+                }
+
+                override fun onSuccess() {
+                    subscriber.onSuccess()
+                }
+
+                override fun onError(error: Throwable) {
+                    subscriber.onError(error)
+                }
+
+            }
             val outputSubscriber = Subscriber(
-                DisposableObserverProxy(object : DisposableObserver<T>() {
-
-                    override fun onNext(item: T) {
-                        if (!predicate.apply(item)) {
-                            onSuccess()
-                            dispose()
-                        } else {
-                            subscriber.onNext(item)
-                        }
-                    }
-
-                    override fun onSuccess() {
-                        subscriber.onSuccess()
-                    }
-
-                    override fun onError(error: Throwable) {
-                        subscriber.onError(error)
-                    }
-
-                })
+                DisposableObserverProxy(observer)
             )
-            this.subscribe(outputSubscriber)
+            var upstreamDisposable: Disposable? = null
+            val onDispose = OnDispose {
+                upstreamDisposable?.dispose()
+                observer.dispose()
+            }
+            subscriber.onDispose = onDispose
+            observer.onDispose = onDispose
+            upstreamDisposable = this.subscribe(outputSubscriber)
         }
     )
 }
 
 abstract class DisposableObserver<T>: Observer<T>, Disposable {
 
+    var onDispose: OnDispose = EmptyOnDispose
+
     override var isDisposed: Boolean = false
 
     override fun dispose() {
-        isDisposed = true
+        if (!isDisposed) {
+            isDisposed = true
+            onDispose.onDispose()
+        }
     }
 }
 
